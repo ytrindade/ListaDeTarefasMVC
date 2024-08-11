@@ -24,21 +24,33 @@ namespace ListaDeTarefasWebMVC.Controllers
             var allTasks = _context.Tasks.ToList();
             return View(allTasks);
         }
-        public IActionResult CreateEditTask()
+        public IActionResult CreateEditTask(int? id)
         {
+            if(id != null)
+            {
+                var taskInDb = _context.Tasks.SingleOrDefault(task => task.Id == id);
+                return View(taskInDb);
+            }          
             return View();
         }
 
-        public IActionResult CreateEditTaskForm(Models.Task taskModel)
+        public IActionResult RemoveTask(int id)
         {
-            _context.Tasks.Add(taskModel);  
+            var taskInDb = _context.Tasks.SingleOrDefault(task => task.Id == id);
+            _context.Tasks.Remove(taskInDb);
             _context.SaveChanges();
             return RedirectToAction("Tasks");
         }
 
-        public IActionResult Privacy()
+        public IActionResult CreateEditTaskForm(Models.Task taskModel)
         {
-            return View();
+            if(taskModel.Id == 0)
+                _context.Tasks.Add(taskModel);
+            else
+                _context.Tasks.Update(taskModel);
+
+            _context.SaveChanges();
+            return RedirectToAction("Tasks");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
